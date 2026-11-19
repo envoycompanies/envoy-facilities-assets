@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Envoy Facilities</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1d2330;--muted:#5b6577;--line:#e3e6eb;--warn:#fff7e0;--warnline:#f1d58a;--link:#1f5fbf}
+@media (prefers-color-scheme:dark){:root{--bg:#12151b;--card:#1b2029;--ink:#e8ebf0;--muted:#9aa4b5;--line:#2a313d;--warn:#3a3016;--warnline:#6b5a22;--link:#7fb0ff}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+.brand{margin:0 0 12px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h1{margin:0;font-size:24px;line-height:1.2}.id{margin:4px 0 16px;color:var(--muted);font-family:ui-monospace,Menlo,monospace}
+h2{margin:24px 0 8px;font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+dt{color:var(--muted)}dd{margin:0;word-break:break-word}
+ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:10px}
+li{padding:10px 14px;border-top:1px solid var(--line)}li:first-child{border-top:0}li span{display:block;font-size:14px;color:var(--muted)}
+.note{background:var(--warn);border:1px solid var(--warnline);border-radius:8px;padding:10px 12px;font-size:14px}
+.muted{color:var(--muted)}.staff{margin-top:28px;font-size:14px}a{color:var(--link)}
+.updated{margin-top:8px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main id="app"><p class="brand">Envoy Facilities</p><p class="muted">Loading…</p></main>
+<script>
+(function(){
+  var APP = 'https://www.appsheet.com/start/2e1dde31-d1bc-49ca-8abb-59af8335080b';
+  var el = document.getElementById('app');
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function msg(t){el.innerHTML='<p class="brand">Envoy Facilities</p><h1>Equipment</h1><p class="muted">'+esc(t)+'</p>';}
+  var id = decodeURIComponent(location.pathname.replace(/^\/+|\/+$/g,'')) || new URLSearchParams(location.search).get('id') || '';
+  if(!id){msg('Scan an equipment QR code to see its details.');return;}
+  fetch('/data.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
+    var key=id.toLowerCase(), byId={};
+    d.assets.forEach(function(a){byId[a.id.toLowerCase()]=a;});
+    var a=byId[key];
+    if(!a){msg('No equipment found for "'+id+'".');return;}
+    var moved='', chain=[a.id];
+    for(var i=0;i<5&&a.movedTo&&byId[a.movedTo.toLowerCase()];i++){a=byId[a.movedTo.toLowerCase()];chain.push(a.id);moved='This unit moved. It is now '+a.id+'.';}
+    var b=a;for(i=0;i<5&&b&&b.movedFrom;i++){if(chain.indexOf(b.movedFrom)<0)chain.push(b.movedFrom);b=byId[b.movedFrom.toLowerCase()];}
+    var lc=chain.map(function(c){return c.toLowerCase();});
+    var specs=[['Location',a.location],['Space',a.space],['Type',a.type],['Manufacturer',a.manufacturer],['Model',a.model],['Serial',a.serial],['Capacity',a.capacity],['Refrigerant',a.refrigerant],['Filter',a.filter],['Belt',a.belt],['Installed',a.installed],['Warranty ends',a.warrantyEnd],['Status',a.status]].filter(function(r){return r[1];});
+    var hist=(d.history||[]).filter(function(w){return lc.indexOf(String(w.asset).toLowerCase())>=0;});
+    var pm=(d.schedules||[]).filter(function(s){return lc.indexOf(String(s.asset).toLowerCase())>=0;});
+    var h='<p class="brand">Envoy Facilities</p><h1>'+esc(a.name||a.id)+'</h1><p class="id">'+esc(a.id)+'</p>';
+    if(moved)h+='<p class="note">'+esc(moved)+'</p>';
+    if(a.unverified)h+='<p class="note">Details below have not been verified on site yet.</p>';
+    h+='<h2>Equipment</h2><dl>'+specs.map(function(r){return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd>';}).join('')+'</dl>';
+    if(pm.length)h+='<h2>Scheduled maintenance</h2><ul>'+pm.map(function(s){return '<li>'+esc(s.name)+'<span>'+esc([s.freq,s.next?'next '+s.next:''].filter(Boolean).join(' · '))+'</span></li>';}).join('')+'</ul>';
+    h+='<h2>Service history</h2>'+(hist.length?'<ul>'+hist.map(function(w){return '<li>'+esc(w.title)+'<span>'+esc([w.date,w.type].filter(Boolean).join(' · '))+'</span></li>';}).join('')+'</ul>':'<p class="muted">No completed service recorded yet.</p>');
+    h+='<p class="staff"><a href="'+APP+'">Staff sign-in</a></p>';
+    if(d.updated)h+='<p class="updated">Updated '+esc(d.updated)+'</p>';
+    el.innerHTML=h; document.title=(a.name||a.id)+' – Envoy Facilities';
+  }).catch(function(){msg('This page could not load right now. Please try again.');});
+})();
+</script>
+</body>
+</html>
