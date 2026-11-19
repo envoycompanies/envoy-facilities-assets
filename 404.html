@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Envoy Facilities</title>
+<title>Envoy Owner's Manual</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--ink:#1d2330;--muted:#5b6577;--line:#e3e6eb;--warn:#fff7e0;--warnline:#f1d58a;--link:#1f5fbf}
 @media (prefers-color-scheme:dark){:root{--bg:#12151b;--card:#1b2029;--ink:#e8ebf0;--muted:#9aa4b5;--line:#2a313d;--warn:#3a3016;--warnline:#6b5a22;--link:#7fb0ff}}
@@ -23,13 +23,13 @@ li{padding:10px 14px;border-top:1px solid var(--line)}li:first-child{border-top:
 </style>
 </head>
 <body>
-<main id="app"><p class="brand">Envoy Facilities</p><p class="muted">Loading…</p></main>
+<main id="app"><p class="brand">Envoy Owner&#39;s Manual</p><p class="muted">Loading…</p></main>
 <script>
 (function(){
   var APP = 'https://www.appsheet.com/start/2e1dde31-d1bc-49ca-8abb-59af8335080b';
   var el = document.getElementById('app');
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  function msg(t){el.innerHTML='<p class="brand">Envoy Facilities</p><h1>Equipment</h1><p class="muted">'+esc(t)+'</p>';}
+  function msg(t){el.innerHTML='<p class="brand">Envoy Owner&#39;s Manual</p><h1>Equipment</h1><p class="muted">'+esc(t)+'</p>';}
   var id = decodeURIComponent(location.pathname.replace(/^\/+|\/+$/g,'')) || new URLSearchParams(location.search).get('id') || '';
   if(!id){msg('Scan an equipment QR code to see its details.');return;}
   fetch('/data.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
@@ -44,7 +44,7 @@ li{padding:10px 14px;border-top:1px solid var(--line)}li:first-child{border-top:
     var specs=[['Location',a.location],['Space',a.space],['Type',a.type],['Manufacturer',a.manufacturer],['Model',a.model],['Serial',a.serial],['Capacity',a.capacity],['Refrigerant',a.refrigerant],['Filter',a.filter],['Belt',a.belt],['Installed',a.installed],['Warranty ends',a.warrantyEnd],['Status',a.status]].filter(function(r){return r[1];});
     var hist=(d.history||[]).filter(function(w){return lc.indexOf(String(w.asset).toLowerCase())>=0;});
     var pm=(d.schedules||[]).filter(function(s){return lc.indexOf(String(s.asset).toLowerCase())>=0;});
-    var h='<p class="brand">Envoy Facilities</p><h1>'+esc(a.name||a.id)+'</h1><p class="id">'+esc(a.id)+'</p>';
+    var h='<p class="brand">Envoy Owner&#39;s Manual</p><h1>'+esc(a.name||a.id)+'</h1><p class="id">'+esc(a.id)+'</p>';
     if(moved)h+='<p class="note">'+esc(moved)+'</p>';
     if(a.unverified)h+='<p class="note">Details below have not been verified on site yet.</p>';
     h+='<h2>Equipment</h2><dl>'+specs.map(function(r){return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd>';}).join('')+'</dl>';
@@ -52,7 +52,7 @@ li{padding:10px 14px;border-top:1px solid var(--line)}li:first-child{border-top:
     h+='<h2>Service history</h2>'+(hist.length?'<ul>'+hist.map(function(w){return '<li>'+esc(w.title)+'<span>'+esc([w.date,w.type].filter(Boolean).join(' · '))+'</span></li>';}).join('')+'</ul>':'<p class="muted">No completed service recorded yet.</p>');
     h+='<p class="staff"><a href="'+APP+'">Staff sign-in</a></p>';
     if(d.updated)h+='<p class="updated">Updated '+esc(d.updated)+'</p>';
-    el.innerHTML=h; document.title=(a.name||a.id)+' – Envoy Facilities';
+    el.innerHTML=h; document.title=(a.name||a.id)+' – Envoy Owner\'s Manual';
   }).catch(function(){msg('This page could not load right now. Please try again.');});
 })();
 </script>
